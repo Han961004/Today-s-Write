@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - 'APP_Django/**'
+  workflow_dispatch:
 
 jobs:
   deploy:
