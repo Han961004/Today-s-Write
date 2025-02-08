@@ -63,9 +63,9 @@ jobs:
 
             # 6. 기존 컨테이너 정리 및 재시작 (Django 앱용 docker-compose 파일 사용)
             cd $PROJECT_DIR
-            sudo docker compose -f docker/docker-compose.production.yml down
+            sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml down
             sudo docker image prune -af
-            sudo docker compose -f docker/docker-compose.production.yml up --build -d
+            sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml up --build -d
 
             echo "✅ Django Deployment completed successfully."
           EOF
