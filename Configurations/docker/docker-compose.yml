@@ -99,7 +99,7 @@ services:
     container_name: prometheus
     volumes:
       - type: bind
-        source: ../../Configurations/docker/prometheus.yml
+        source: ../monitoring/prometheus.yml
         target: /etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
