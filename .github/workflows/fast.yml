@@ -44,14 +44,14 @@ jobs:
             sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
             docker compose version
 
-            # 3. 프로젝트 디렉토리 설정 (FastAPI 앱 전용)
-            PROJECT_DIR="/home/FastAPI"
+            # 3. 프로젝트 디렉토리 설정 (Fast 앱 전용)
+            PROJECT_DIR="/home/Today-s-Write/app_fast"
             sudo mkdir -p $PROJECT_DIR
             sudo chown -R ubuntu:ubuntu $PROJECT_DIR
 
             # 4. Git 저장소 업데이트
             if [ ! -d $PROJECT_DIR/.git ]; then
-                git clone https://github.com/Han961004/Literature.git $PROJECT_DIR
+                git clone https://github.com/Han961004/Today-s-Write.git $PROJECT_DIR
             else
                 cd $PROJECT_DIR
                 git fetch origin main
