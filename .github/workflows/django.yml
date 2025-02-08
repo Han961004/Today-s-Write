@@ -45,7 +45,7 @@ jobs:
             docker compose version
 
             # 3. 프로젝트 디렉토리 설정 (Django 앱 전용)
-            PROJECT_DIR="/home/Today-s-Write/app_django"
+            PROJECT_DIR="/home/Today-s-Write"
             sudo mkdir -p $PROJECT_DIR
             sudo chown -R ubuntu:ubuntu $PROJECT_DIR
 
