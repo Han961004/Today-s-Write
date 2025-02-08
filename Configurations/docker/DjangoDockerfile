@@ -1,18 +1,13 @@
-# DjangoDockerfile (Configurations/docker/DjangoDockerfile)
-
 FROM python:3.11-slim
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    openssh-server \
-    netcat-openbsd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssh-server netcat-openbsd && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 빌드 컨텍스트가 /home/Today-s-Write 인 경우, 루트에 있는 파일들을 복사하려면 ../.. 사용
+# 리포지토리 루트의 requirements.txt를 복사 (빌드 컨텍스트가 리포지토리 루트임)
 COPY ../../requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 리포지토리 전체를 복사 (루트에 있는 모든 파일 및 디렉토리)
+# 리포지토리 전체를 복사
 COPY ../../ .
+
 CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py collectstatic --noinput && python manage.py migrate && gunicorn -k uvicorn.workers.UvicornWorker config.asgi:application --bind 0.0.0.0:8000 --workers 1 --threads 4"]
