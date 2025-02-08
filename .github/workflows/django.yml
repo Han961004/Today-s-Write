@@ -59,7 +59,7 @@ jobs:
             fi
 
             # 5. nginx.conf 파일 존재 여부 확인
-            cat $PROJECT_DIR/docker/nginx.conf || { echo "❌ nginx.conf 파일이 없습니다. 배포 중지."; exit 1; }
+            cat /home/Today-s-Write/Configurations/Nginx/nginx.conf || { echo "❌ nginx.conf 파일이 없습니다. 배포 중지."; exit 1; }
 
             # 6. 기존 컨테이너 정리 및 재시작 (Django 앱용 docker-compose 파일 사용)
             cd $PROJECT_DIR
