@@ -1,24 +1,18 @@
-# 베이스 이미지 설정
-FROM python:3.11-slim
+# DjangoDockerfile (Configurations/docker/DjangoDockerfile)
 
-# 작업 디렉토리 설정
+FROM python:3.11-slim
 WORKDIR /app
 
-# 시스템 패키지 설치 (예: SSH 서버, netcat 등)
 RUN apt-get update && apt-get install -y \
     openssh-server \
     netcat-openbsd \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Django 앱의 의존성 파일 복사 (APP_Django/requirements.txt)
-COPY ../APP_Django/requirements.txt ./
-
-# 의존성 설치
+# 빌드 컨텍스트가 /home/Today-s-Write 인 경우, 루트에 있는 파일들을 복사하려면 ../.. 사용
+COPY ../../requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Django 앱 코드 복사
-COPY ../APP_Django/ ./
-
-# 컨테이너 실행 시 PostgreSQL(db) 연결 대기 후,
-# collectstatic, 마이그레이션 수행 후 Gunicorn으로 ASGI 서버 실행
+# 리포지토리 전체를 복사 (루트에 있는 모든 파일 및 디렉토리)
+COPY ../../ .
 CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py collectstatic --noinput && python manage.py migrate && gunicorn -k uvicorn.workers.UvicornWorker config.asgi:application --bind 0.0.0.0:8000 --workers 1 --threads 4"]
