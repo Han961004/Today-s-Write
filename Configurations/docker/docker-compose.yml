@@ -19,7 +19,7 @@ services:
 
   django_app:
     build:
-      context: .
+      context: ../../
       dockerfile: Configurations/docker/DjangoDockerfile
     container_name: django_app
     command: >
@@ -43,7 +43,7 @@ services:
 
   fast_app:
     build:
-      context: .
+      context: ../../
       dockerfile: Configurations/docker/FastDockerfile
     container_name: fast_app
     command: >
