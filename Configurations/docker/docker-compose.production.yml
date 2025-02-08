@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_server
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+      - fast
+    volumes:
+      # Nginx 설정 파일 경로 변경: docker-compose.yml 기준 상대경로
+      - ../../Configurations/Nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../APP_Django/static:/app/static
+      - ../../APP_Django/media:/app/media
+    command: ["nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf"]
+    networks:
+      - mynetwork
+
+  django:
+    build:
+      context: ../../
+      dockerfile: Configurations/docker/DjangoDockerfile
+    container_name: django_app
+    command: >
+      sh -c "while ! nc -z django_db 5432; do sleep 1; done &&
+            python manage.py collectstatic --noinput &&
+            python manage.py migrate &&
+            gunicorn -k uvicorn.workers.UvicornWorker config.asgi:application --bind 0.0.0.0:8000 --workers 1 --threads 2"
+    restart: always
+    volumes:
+      - ../../:/app
+      - ../../APP_Django/static:/app/static
+    expose:
+      - "8000"
+    depends_on:
+      django_db:
+        condition: service_healthy
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    networks:
+      - mynetwork
+
+  fast:
+    build:
+      context: ../../
+      dockerfile: Configurations/docker/FastDockerfile
+    container_name: fast_app
+    command: >
+      sh -c "while ! nc -z fast_db 5432; do sleep 1; done &&
+             uvicorn main:app --host 0.0.0.0 --port 8001 --workers 1"
+    restart: always
+    volumes:
+      - ../../:/app
+    expose:
+      - "8001"
+    depends_on:
+      fast_db:
+        condition: service_healthy
+    networks:
+      - mynetwork
+
+  django_db:
+    image: postgres:latest
+    container_name: django_db
+    environment:
+      - POSTGRES_DB=app_django
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=0000
+    volumes:
+      - postgres_data_django:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fast_db:
+    image: postgres:latest
+    container_name: fast_db
+    environment:
+      - POSTGRES_DB=app_fast
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=0000
+    volumes:
+      - postgres_data_fast:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - type: bind
+        source: ../../Configurations/docker/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - mynetwork
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - mynetwork
+
+volumes:
+  postgres_data_django:
+  postgres_data_fast:
+  grafana_data:
+
+networks:
+  mynetwork:
+    driver: bridge

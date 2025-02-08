@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    netcat-openbsd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# FastAPI 앱의 의존성 파일 복사 (APP_FAST/requirements.txt)
+COPY ../APP_FAST/requirements.txt ./
+
+# 의존성 설치
+RUN pip install --no-cache-dir -r requirements.txt
+
+# FastAPI 앱 코드 복사
+COPY ../APP_FAST/ ./
+
+# PostgreSQL(db) 연결 대기 후 Uvicorn 실행 (포트 8001 사용)
+CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && uvicorn main:app --host 0.0.0.0 --port 8001 --workers 1"]
