@@ -7,8 +7,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - web
-      - fast
+      - django_app
+      - fast_app
     volumes:
       # Nginx 설정 파일 경로 변경: docker-compose.yml 기준 상대경로
       - ../../Configurations/Nginx/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -18,9 +18,9 @@ services:
     networks:
       - mynetwork
 
-  django:
+  django_app:
     build:
-      context: ../../
+      context: .
       dockerfile: Configurations/docker/DjangoDockerfile
     container_name: django_app
     command: >
@@ -42,9 +42,9 @@ services:
     networks:
       - mynetwork
 
-  fast:
+  fast_app:
     build:
-      context: ../../
+      context: .
       dockerfile: Configurations/docker/FastDockerfile
     container_name: fast_app
     command: >
