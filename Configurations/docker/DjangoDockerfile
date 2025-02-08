@@ -3,11 +3,14 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y openssh-server netcat-openbsd && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 리포지토리 루트의 requirements.txt를 복사 (빌드 컨텍스트가 리포지토리 루트임)
+# APP_Django/requirements.txt 복사 및 패키지 설치
 COPY APP_Django/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 리포지토리 전체를 복사
-COPY ../../ .
+# 리포지토리 전체 복사 (빌드 컨텍스트는 Today-s-Write)
+COPY . .
+
+# manage.py가 있는 APP_Django 디렉터리로 이동
+WORKDIR /app/APP_Django
 
 CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py collectstatic --noinput && python manage.py migrate && gunicorn -k uvicorn.workers.UvicornWorker config.asgi:application --bind 0.0.0.0:8000 --workers 1 --threads 4"]
