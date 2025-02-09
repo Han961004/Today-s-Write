@@ -1,7 +1,12 @@
 FROM python:3.11-slim
+
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y openssh-server netcat-openbsd && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    netcat-openbsd \
+    postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # APP_Django/requirements.txt 복사 및 패키지 설치
 COPY APP_Django/requirements.txt .
