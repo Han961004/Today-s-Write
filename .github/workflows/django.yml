@@ -39,7 +39,7 @@ jobs:
               sudo docker image prune -af
 
               echo '🚀 Starting new Django container...'
-              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale django_app=1
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d django_app django_db
 
               echo '✅ Django Deployment completed successfully.'
           "
