@@ -32,7 +32,9 @@ jobs:
           SCALE: ${{ inputs.scale }}
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << 'EOF'
-          
+          echo "🚀 Deploying service: ${{ inputs.service }}"
+          echo "🛠 Scale: ${{ inputs.scale }}"
+
           set -e
           
           # 1. 기존 apt 프로세스 종료 및 락 파일 삭제
