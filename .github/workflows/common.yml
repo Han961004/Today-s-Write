@@ -4,25 +4,27 @@ on:
   workflow_call:
     inputs:
       service:
-        description: '배포할 서비스 이름 (예: django_app, fast_app)'
+        description: '배포할 서비스 이름 (fast_app)'
         required: true
         type: string
+        default: "fast_app"
       scale:
         description: '서비스 복제본 수'
         required: false
         type: string
-        default: "1"
+        default: "2"
   workflow_dispatch:
     inputs:
-      service:
-        description: '배포할 서비스 이름 (예: django_app, fast_app)'
-        required: true
-        type: string
-      scale:
-        description: '서비스 복제본 수'
-        required: false
-        type: string
-        default: "1"
+        service:
+            description: '배포할 서비스 이름 (fast_app)'
+            required: true
+            type: string
+            default: "fast_app"
+        scale:
+            description: '서비스 복제본 수'
+            required: false
+            type: string
+            default: "2"
 
 jobs:
   deploy:
