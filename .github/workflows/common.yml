@@ -39,7 +39,7 @@ jobs:
       - name: Deploy to AWS Lightsail
         env:
           SERVICE: ${{ inputs.service }}
-          SCALE: ${{ inputs.scale || '1' }}  # ✅ 기본값 1 적용
+          SCALE: ${{ inputs.scale }}  # ✅ 기본값 1 적용
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << EOF
           
@@ -80,8 +80,8 @@ jobs:
           sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml down
           sudo docker image prune -af
           
-          # 6. 서비스 배포 (서비스 이름과 복제본 수 적용)
-          sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml up --build -d --scale $SERVICE=${SCALE:-1}
+          # 6. 서비스 배포 (scale 값을 직접 지정)
+          sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
           
           echo "✅ Deployment for $SERVICE completed successfully."
           EOF
