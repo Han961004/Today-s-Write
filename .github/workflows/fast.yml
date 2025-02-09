@@ -6,16 +6,9 @@ on:
       - main
     paths:
       - 'APP_FAST/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'APP_FAST/**'
   workflow_dispatch:
 
 jobs:
   deploy:
     uses: ./.github/workflows/common.yml
-    with:
-      service: "fast_app"
     secrets: inherit

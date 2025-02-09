@@ -1,24 +1,12 @@
 name: Common Deployment
 
 on:
-  workflow_call:
-    inputs:
-      service:
-        description: '배포할 서비스 이름 (예: django_app, fast_app)'
-        required: true
-        type: string
-  workflow_dispatch:
-    inputs:
-      service:
-        description: '배포할 서비스 이름 (예: django_app, fast_app)'
-        required: true
-        type: string
+    workflow_call:
+    workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      PROJECT_DIR: "/home/Today-s-Write"  # ✅ GitHub Actions에서 환경 변수 설정
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,40 +17,24 @@ jobs:
           ssh-private-key: ${{ secrets.AWS_LS_SSH_KEY }}
 
       - name: Deploy to AWS Lightsail
-        env:
-          SERVICE: ${{ inputs.service }}
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} "
-              export PROJECT_DIR='${PROJECT_DIR}'  # ✅ SSH 실행 시 환경 변수 강제 적용
-              
-              if [ -z \"\$PROJECT_DIR\" ]; then
-                  echo '❌ PROJECT_DIR 값이 비어 있음. 기본값 설정 실패'
-                  exit 1
-              fi
-              
-              echo '✅ PROJECT_DIR is set to: ' \$PROJECT_DIR
+              echo '🚀 Starting deployment...'
 
-              # 프로젝트 디렉토리 확인
-              if [ ! -d \"\$PROJECT_DIR\" ]; then
-                  echo '📂 Creating project directory...'
-                  sudo mkdir -p \"\$PROJECT_DIR\"
-                  sudo chown -R ubuntu:ubuntu \"\$PROJECT_DIR\"
-                  git clone https://github.com/Han961004/Today-s-Write.git \"\$PROJECT_DIR\"
-              else
-                  echo '🔄 Updating project repository...'
-                  cd \"\$PROJECT_DIR\"
-                  git fetch origin main
-                  git reset --hard origin/main
-              fi
+              PROJECT_DIR='/home/Today-s-Write'
+              cd \"\$PROJECT_DIR\"
 
-              # 기존 컨테이너 정리
+              # Git 업데이트
+              echo '🔄 Fetching latest changes...'
+              git fetch origin main
+              git reset --hard origin/main
+
               echo '🛑 Stopping old containers...'
               sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" down
               sudo docker image prune -af
 
-              # 새 서비스 배포
-              echo '🚀 Deploying service: $SERVICE'
+              echo '🚀 Starting new containers (Django=1, FastAPI=2)...'
               sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale django_app=1 --scale fast_app=2
 
-              echo '✅ Deployment for $SERVICE completed successfully.'
+              echo '✅ Deployment completed successfully.'
           "

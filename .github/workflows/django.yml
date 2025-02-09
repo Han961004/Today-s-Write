@@ -6,17 +6,9 @@ on:
       - main
     paths:
       - 'APP_Django/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'APP_Django/**'
   workflow_dispatch:
 
 jobs:
   deploy:
     uses: ./.github/workflows/common.yml
-    with:
-      service: "django_app"
-      scale: "1"
     secrets: inherit  # ✅ Secrets 상속 설정
