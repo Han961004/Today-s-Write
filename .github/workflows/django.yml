@@ -19,3 +19,4 @@ jobs:
     with:
       service: "django_app"
       scale: "1"
+    secrets: inherit  # ✅ Secrets 상속 설정
