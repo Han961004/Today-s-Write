@@ -38,8 +38,8 @@ jobs:
               sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" rm -f fast_app
               sudo docker image prune -af
 
-              echo '🚀 Starting new FastAPI containers...'
-              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale fast_app=2
+              echo '🚀 Starting new FastAPI containers (2 instances)...'
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale fast_app=2 fast_app fast_db
 
               echo '✅ FastAPI Deployment completed successfully.'
           "
