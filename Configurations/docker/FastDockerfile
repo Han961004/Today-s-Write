@@ -1,6 +1,7 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+# 이거 워크 디렉토리가 달라서 /APP_FAST 꼭 해야한데
+WORKDIR /app/APP_FAST
 
 RUN apt-get update && apt-get install -y \
     openssh-server \
@@ -16,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY APP_FAST/ .
 
 # DB가 열릴 때까지 대기 후 uvicorn 실행
-CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && uvicorn main:app --host 0.0.0.0 --port 8001 --workers 1"]
+CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && uvicorn /APP_FAST/main:app --host 0.0.0.0 --port 8001 --workers 1"]

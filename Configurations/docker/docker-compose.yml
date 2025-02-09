@@ -51,6 +51,7 @@ services:
     depends_on:
       fast_db:
         condition: service_healthy
+    scale: 2  # 원하는 수로 설정 (여기서는 2로 설정)
 
   django_db:
     image: postgres:latest
