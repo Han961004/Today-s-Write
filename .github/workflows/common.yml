@@ -1,4 +1,4 @@
-name: Common Deploy
+name: Common
 
 on:
   workflow_call:
@@ -51,6 +51,10 @@ jobs:
           
           # 3. 프로젝트 디렉토리 설정 및 Git 업데이트
           PROJECT_DIR="/home/Today-s-Write"
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "❌ PROJECT_DIR 값이 비어있음. 기본값 /home/Today-s-Write 설정"
+            PROJECT_DIR="/home/Today-s-Write"
+          fi
 
           sudo mkdir -p "$PROJECT_DIR"
           sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
