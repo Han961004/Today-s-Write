@@ -17,6 +17,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: "/home/Today-s-Write"  # ✅ GitHub Actions에서 환경 변수 설정
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,31 +33,16 @@ jobs:
           SERVICE: ${{ inputs.service }}
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} "
-              set -e
-              echo '🚀 Deploying service: $SERVICE'
-
-              # 프로젝트 디렉토리 설정
-              PROJECT_DIR='/home/Today-s-Write'
+              export PROJECT_DIR='${PROJECT_DIR}'  # ✅ SSH 실행 시 환경 변수 강제 적용
+              
               if [ -z \"\$PROJECT_DIR\" ]; then
                   echo '❌ PROJECT_DIR 값이 비어 있음. 기본값 설정 실패'
                   exit 1
               fi
-              echo '📂 Using project directory: ' \$PROJECT_DIR
+              
+              echo '✅ PROJECT_DIR is set to: ' \$PROJECT_DIR
 
-              # 1. Docker 및 시스템 패키지 업데이트
-              echo '🔄 Updating system packages...'
-              sudo apt update && sudo apt install -y docker.io curl
-
-              # 2. Docker Compose 최신 버전 설치
-              echo '🔄 Installing Docker Compose...'
-              sudo mkdir -p /usr/local/lib/docker/cli-plugins
-              sudo curl -SL 'https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64' \
-                  -o /usr/local/lib/docker/cli-plugins/docker-compose
-              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-              docker compose version
-
-              # 3. Git 업데이트
-              echo '🔍 Checking project directory...'
+              # 프로젝트 디렉토리 확인
               if [ ! -d \"\$PROJECT_DIR\" ]; then
                   echo '📂 Creating project directory...'
                   sudo mkdir -p \"\$PROJECT_DIR\"
@@ -68,22 +55,14 @@ jobs:
                   git reset --hard origin/main
               fi
 
-              # 4. nginx.conf 파일 확인
-              if [ ! -f \"\$PROJECT_DIR/Configurations/nginx/nginx.conf\" ]; then
-                  echo '❌ nginx.conf 파일이 없습니다. 배포 중지.'
-                  exit 1
-              fi
-              echo '✅ nginx.conf 파일 확인 완료.'
-
-              # 5. 기존 컨테이너 중지 및 이미지 정리
+              # 기존 컨테이너 정리
               echo '🛑 Stopping old containers...'
-              cd \"\$PROJECT_DIR\"
-              sudo docker compose -f Configurations/docker/docker-compose.yml down
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" down
               sudo docker image prune -af
 
-              # 6. 새로운 서비스 배포
+              # 새 서비스 배포
               echo '🚀 Deploying service: $SERVICE'
-              sudo docker compose -f Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale django_app=1 --scale fast_app=2
 
               echo '✅ Deployment for $SERVICE completed successfully.'
           "
