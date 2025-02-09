@@ -30,60 +30,60 @@ jobs:
         env:
           SERVICE: ${{ inputs.service }}
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << 'EOF'
-          
-          set -e
-          echo "🚀 Starting deployment for service: $SERVICE"
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} "
+              set -e
+              echo '🚀 Deploying service: $SERVICE'
 
-          # 프로젝트 경로 설정
-          PROJECT_DIR="/home/Today-s-Write"
-          echo "📂 Using project directory: $PROJECT_DIR"
+              # 프로젝트 디렉토리 설정
+              PROJECT_DIR='/home/Today-s-Write'
+              if [ -z \"\$PROJECT_DIR\" ]; then
+                  echo '❌ PROJECT_DIR 값이 비어 있음. 기본값 설정 실패'
+                  exit 1
+              fi
+              echo '📂 Using project directory: ' \$PROJECT_DIR
 
-          # 1. 시스템 패키지 업데이트 및 Docker 설치
-          echo "🔄 Updating system packages..."
-          sudo pkill -9 apt || true
-          sudo rm -rf /var/lib/apt/lists/lock /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
-          sudo apt update
-          sudo apt install -y docker.io curl
+              # 1. Docker 및 시스템 패키지 업데이트
+              echo '🔄 Updating system packages...'
+              sudo apt update && sudo apt install -y docker.io curl
 
-          # Docker Compose 설치 (최신 버전)
-          echo "🔄 Installing Docker Compose..."
-          sudo mkdir -p /usr/local/lib/docker/cli-plugins
-          sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
-              -o /usr/local/lib/docker/cli-plugins/docker-compose
-          sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-          docker compose version
+              # 2. Docker Compose 최신 버전 설치
+              echo '🔄 Installing Docker Compose...'
+              sudo mkdir -p /usr/local/lib/docker/cli-plugins
+              sudo curl -SL 'https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64' \
+                  -o /usr/local/lib/docker/cli-plugins/docker-compose
+              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+              docker compose version
 
-          # 2. 프로젝트 디렉토리 확인 및 업데이트
-          echo "🔍 Checking project directory..."
-          if [ ! -d "$PROJECT_DIR" ]; then
-              echo "📂 Creating project directory..."
-              sudo mkdir -p "$PROJECT_DIR"
-              sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
-              git clone https://github.com/Han961004/Today-s-Write.git "$PROJECT_DIR"
-          else
-              echo "🔄 Updating project repository..."
-              cd "$PROJECT_DIR"
-              git fetch origin main
-              git reset --hard origin/main
-          fi
+              # 3. Git 업데이트
+              echo '🔍 Checking project directory...'
+              if [ ! -d \"\$PROJECT_DIR\" ]; then
+                  echo '📂 Creating project directory...'
+                  sudo mkdir -p \"\$PROJECT_DIR\"
+                  sudo chown -R ubuntu:ubuntu \"\$PROJECT_DIR\"
+                  git clone https://github.com/Han961004/Today-s-Write.git \"\$PROJECT_DIR\"
+              else
+                  echo '🔄 Updating project repository...'
+                  cd \"\$PROJECT_DIR\"
+                  git fetch origin main
+                  git reset --hard origin/main
+              fi
 
-          # 3. nginx.conf 파일 확인
-          if [ ! -f "/home/Today-s-Write/Configurations/nginx/nginx.conf" ]; then
-              echo "❌ nginx.conf 파일이 없습니다. 배포 중지."
-              exit 1
-          fi
-          echo "✅ nginx.conf 파일 확인 완료."
+              # 4. nginx.conf 파일 확인
+              if [ ! -f \"\$PROJECT_DIR/Configurations/nginx/nginx.conf\" ]; then
+                  echo '❌ nginx.conf 파일이 없습니다. 배포 중지.'
+                  exit 1
+              fi
+              echo '✅ nginx.conf 파일 확인 완료.'
 
-          # 4. 기존 컨테이너 중지 및 이미지 정리
-          echo "🛑 Stopping old containers..."
-          cd "$PROJECT_DIR"
-          sudo docker compose -f Configurations/docker/docker-compose.yml down
-          sudo docker image prune -af
+              # 5. 기존 컨테이너 중지 및 이미지 정리
+              echo '🛑 Stopping old containers...'
+              cd \"\$PROJECT_DIR\"
+              sudo docker compose -f Configurations/docker/docker-compose.yml down
+              sudo docker image prune -af
 
-          # 5. 새로운 서비스 배포
-          echo "🚀 Deploying service: $SERVICE"
-          sudo docker compose -f Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
+              # 6. 새로운 서비스 배포
+              echo '🚀 Deploying service: $SERVICE'
+              sudo docker compose -f Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
 
-          echo "✅ Deployment for $SERVICE completed successfully."
-          EOF
+              echo '✅ Deployment for $SERVICE completed successfully.'
+          "
