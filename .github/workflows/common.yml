@@ -1,8 +1,7 @@
-name: Common Deployment
+name: Common Infrastructure Deployment
 
 on:
-    workflow_call:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -16,10 +15,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.AWS_LS_SSH_KEY }}
 
-      - name: Deploy to AWS Lightsail
+      - name: Deploy Common Infrastructure
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} "
-              echo '🚀 Starting deployment...'
+              echo '🚀 Deploying Common Infrastructure (Nginx, Prometheus, Grafana)...'
 
               PROJECT_DIR='/home/Today-s-Write'
               cd \"\$PROJECT_DIR\"
@@ -29,12 +28,13 @@ jobs:
               git fetch origin main
               git reset --hard origin/main
 
-              echo '🛑 Stopping old containers...'
-              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" down
+              echo '🛑 Stopping old infrastructure containers...'
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" stop nginx prometheus grafana
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" rm -f nginx prometheus grafana
               sudo docker image prune -af
 
-              echo '🚀 Starting new containers (Django=1, FastAPI=2)...'
-              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale django_app=1 --scale fast_app=2
+              echo '🚀 Starting Common Infrastructure containers...'
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d nginx prometheus grafana
 
-              echo '✅ Deployment completed successfully.'
+              echo '✅ Common Infrastructure Deployment completed successfully.'
           "

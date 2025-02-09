@@ -10,5 +10,36 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/common.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH keys
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.AWS_LS_SSH_KEY }}
+
+      - name: Deploy FastAPI to AWS Lightsail
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} "
+              echo '🚀 Deploying FastAPI...'
+
+              PROJECT_DIR='/home/Today-s-Write'
+              cd \"\$PROJECT_DIR\"
+
+              # Git 업데이트
+              echo '🔄 Fetching latest changes...'
+              git fetch origin main
+              git reset --hard origin/main
+
+              echo '🛑 Stopping old FastAPI containers...'
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" stop fast_app
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" rm -f fast_app
+              sudo docker image prune -af
+
+              echo '🚀 Starting new FastAPI containers...'
+              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d --scale fast_app=2
+
+              echo '✅ FastAPI Deployment completed successfully.'
+          "
