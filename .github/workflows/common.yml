@@ -49,24 +49,22 @@ jobs:
           sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
           docker compose version
           
-          # 3. 프로젝트 디렉토리 설정 및 Git 업데이트
-          PROJECT_DIR="/home/Today-s-Write"
-          if [ -z "$PROJECT_DIR" ]; then
-            echo "❌ PROJECT_DIR 값이 비어있음. 기본값 /home/Today-s-Write 설정"
+            # 3. 프로젝트 디렉토리 설정 및 Git 업데이트
             PROJECT_DIR="/home/Today-s-Write"
-          fi
 
-          sudo mkdir -p "$PROJECT_DIR"
-          sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
+            echo "📂 Using project directory: $PROJECT_DIR"
 
-          if [ ! -d "$PROJECT_DIR/.git" ]; then
-              git clone https://github.com/Han961004/Today-s-Write.git "$PROJECT_DIR"
-          else
-              cd "$PROJECT_DIR"
-              git fetch origin main
-              git reset --hard origin/main
-          fi
-          
+            sudo mkdir -p "$PROJECT_DIR" || { echo "❌ Failed to create project directory"; exit 1; }
+            sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
+
+            if [ ! -d "$PROJECT_DIR/.git" ]; then
+                git clone https://github.com/Han961004/Today-s-Write.git "$PROJECT_DIR"
+            else
+                cd "$PROJECT_DIR"
+                git fetch origin main
+                git reset --hard origin/main
+            fi
+
           # 4. nginx.conf 파일 확인
           cat /home/Today-s-Write/Configurations/nginx/nginx.conf || { echo "❌ nginx.conf 파일이 없습니다. 배포 중지."; exit 1; }
           
