@@ -4,27 +4,15 @@ on:
   workflow_call:
     inputs:
       service:
-        description: '배포할 서비스 이름 (fast_app)'
+        description: '배포할 서비스 이름 (예: django_app, fast_app)'
         required: true
         type: string
-        default: "fast_app"
-      scale:
-        description: '서비스 복제본 수'
-        required: false
-        type: string
-        default: "2"
   workflow_dispatch:
     inputs:
-        service:
-            description: '배포할 서비스 이름 (fast_app)'
-            required: true
-            type: string
-            default: "fast_app"
-        scale:
-            description: '서비스 복제본 수'
-            required: false
-            type: string
-            default: "2"
+      service:
+        description: '배포할 서비스 이름 (예: django_app, fast_app)'
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -41,14 +29,13 @@ jobs:
       - name: Deploy to AWS Lightsail
         env:
           SERVICE: ${{ inputs.service }}
-          SCALE: ${{ inputs.scale }}  # ✅ 기본값 1 적용
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << EOF
           
           set -e
 
           echo "🚀 Deploying service: $SERVICE"
-          echo "🛠 Scale: ${SCALE:-1}"
+          echo "🛠 Fixed Scale: django_app=1, fast_app=2"
 
           # 1. 기존 apt 프로세스 종료 및 락 파일 삭제
           sudo pkill -9 apt || true
@@ -64,12 +51,14 @@ jobs:
           
           # 3. 프로젝트 디렉토리 설정 및 Git 업데이트
           PROJECT_DIR="/home/Today-s-Write"
-          sudo mkdir -p $PROJECT_DIR
-          sudo chown -R ubuntu:ubuntu $PROJECT_DIR
-          if [ ! -d $PROJECT_DIR/.git ]; then
-              git clone https://github.com/Han961004/Today-s-Write.git $PROJECT_DIR
+
+          sudo mkdir -p "$PROJECT_DIR"
+          sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
+
+          if [ ! -d "$PROJECT_DIR/.git" ]; then
+              git clone https://github.com/Han961004/Today-s-Write.git "$PROJECT_DIR"
           else
-              cd $PROJECT_DIR
+              cd "$PROJECT_DIR"
               git fetch origin main
               git reset --hard origin/main
           fi
@@ -78,11 +67,11 @@ jobs:
           cat /home/Today-s-Write/Configurations/nginx/nginx.conf || { echo "❌ nginx.conf 파일이 없습니다. 배포 중지."; exit 1; }
           
           # 5. 기존 컨테이너 정리 및 이미지 정리
-          cd $PROJECT_DIR
+          cd "$PROJECT_DIR"
           sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml down
           sudo docker image prune -af
           
-          # 6. 서비스 배포 (scale 값을 직접 지정)
+          # 6. 서비스 배포 (고정된 스케일 적용)
           sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
           
           echo "✅ Deployment for $SERVICE completed successfully."
