@@ -25,15 +25,13 @@ jobs:
 
               # Git 업데이트
               echo '🔄 Fetching latest changes...'
-              git fetch origin main
-              git reset --hard origin/main
+              git pull origin main || (git fetch origin main && git reset --hard origin/main)
 
-              echo '🛑 Stopping old infrastructure containers...'
-              sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" stop nginx prometheus grafana
+              echo '🛑 Removing old infrastructure containers...'
               sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" rm -f nginx prometheus grafana
               sudo docker image prune -af
 
-              echo '🚀 Starting Common Infrastructure containers...'
+              echo '🚀 Restarting Common Infrastructure containers...'
               sudo docker compose -f \"\$PROJECT_DIR/Configurations/docker/docker-compose.yml\" up --build -d nginx prometheus grafana
 
               echo '✅ Common Infrastructure Deployment completed successfully.'
