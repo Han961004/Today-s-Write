@@ -30,29 +30,34 @@ jobs:
         env:
           SERVICE: ${{ inputs.service }}
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << EOF
-          
-          set -e
+            ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << EOF
 
-          echo "🚀 Deploying service: $SERVICE"
-          echo "🛠 Fixed Scale: django_app=1, fast_app=2"
+            set -e
 
-          # 1. 기존 apt 프로세스 종료 및 락 파일 삭제
-          sudo pkill -9 apt || true
-          sudo rm -rf /var/lib/apt/lists/lock /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
-          
-          # 2. Docker 및 Docker Compose 설치
-          sudo apt update && sudo apt install -y docker.io curl
-          sudo mkdir -p /usr/local/lib/docker/cli-plugins
-          sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
-              -o /usr/local/lib/docker/cli-plugins/docker-compose
-          sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-          docker compose version
-          
+            echo "🚀 Deploying service: $SERVICE"
+            echo "🛠 Fixed Scale: django_app=1, fast_app=2"
+
+            # 1. 기존 apt 프로세스 종료 및 락 파일 삭제
+            sudo pkill -9 apt || true
+            sudo rm -rf /var/lib/apt/lists/lock /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
+
+            # 2. Docker 및 Docker Compose 설치
+            sudo apt update && sudo apt install -y docker.io curl
+            sudo mkdir -p /usr/local/lib/docker/cli-plugins
+            sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
+                -o /usr/local/lib/docker/cli-plugins/docker-compose
+            sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+            docker compose version
+
             # 3. 프로젝트 디렉토리 설정 및 Git 업데이트
-            PROJECT_DIR="/home/Today-s-Write"
+            PROJECT_DIR=${PROJECT_DIR:-"/home/Today-s-Write"}  # 기본값 설정
 
             echo "📂 Using project directory: $PROJECT_DIR"
+
+            if [ -z "$PROJECT_DIR" ]; then
+            echo "❌ PROJECT_DIR 값이 비어 있음. 기본값 설정 실패"
+            exit 1
+            fi
 
             sudo mkdir -p "$PROJECT_DIR" || { echo "❌ Failed to create project directory"; exit 1; }
             sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
@@ -65,16 +70,17 @@ jobs:
                 git reset --hard origin/main
             fi
 
-          # 4. nginx.conf 파일 확인
-          cat /home/Today-s-Write/Configurations/nginx/nginx.conf || { echo "❌ nginx.conf 파일이 없습니다. 배포 중지."; exit 1; }
-          
-          # 5. 기존 컨테이너 정리 및 이미지 정리
-          cd "$PROJECT_DIR"
-          sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml down
-          sudo docker image prune -af
-          
-          # 6. 서비스 배포 (고정된 스케일 적용)
-          sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
-          
-          echo "✅ Deployment for $SERVICE completed successfully."
-          EOF
+
+            # 4. nginx.conf 파일 확인
+            cat /home/Today-s-Write/Configurations/nginx/nginx.conf || { echo "❌ nginx.conf 파일이 없습니다. 배포 중지."; exit 1; }
+
+            # 5. 기존 컨테이너 정리 및 이미지 정리
+            cd "$PROJECT_DIR"
+            sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml down
+            sudo docker image prune -af
+
+            # 6. 서비스 배포 (고정된 스케일 적용)
+            sudo docker compose -f /home/Today-s-Write/Configurations/docker/docker-compose.yml up --build -d --scale django_app=1 --scale fast_app=2
+
+            echo "✅ Deployment for $SERVICE completed successfully."
+            EOF
