@@ -13,6 +13,16 @@ on:
         type: string
         default: "1"
   workflow_dispatch:
+    inputs:
+      service:
+        description: '배포할 서비스 이름 (예: django_app, fast_app)'
+        required: true
+        type: string
+      scale:
+        description: '서비스 복제본 수'
+        required: false
+        type: string
+        default: "1"
 
 jobs:
   deploy:
@@ -29,14 +39,14 @@ jobs:
       - name: Deploy to AWS Lightsail
         env:
           SERVICE: ${{ inputs.service }}
-          SCALE: ${{ inputs.scale }}
+          SCALE: ${{ inputs.scale || '1' }}  # ✅ 기본값 1 적용
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.AWS_LS_IP }} << EOF
           
           set -e
 
           echo "🚀 Deploying service: $SERVICE"
-          echo "🛠 Scale: $SCALE"
+          echo "🛠 Scale: ${SCALE:-1}"
 
           # 1. 기존 apt 프로세스 종료 및 락 파일 삭제
           sudo pkill -9 apt || true
