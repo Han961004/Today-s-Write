@@ -5,7 +5,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 app = FastAPI(title="FastAPI Application")
 
 # 라우터 등록
-app.include_router(posts.router, prefix='/posts')  # /posts 경로는 라우터에서 처리
+app.include_router(posts.router, prefix='/api/posts')  # /posts 경로는 라우터에서 처리
 
 # Prometheus 모니터링
 instrumentator = Instrumentator()
