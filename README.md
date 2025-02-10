@@ -8,27 +8,12 @@
 ## 글 작성
 
 
-# 기술 스택
-- 모바일 
-Android Studio 
-Kotlin
-
-- 백엔드
-- Django Rest Framework
-- Fast API
-
-- 데이터베이스
-- Postgresql
-
-- 인프라
-- AWS Lightsail
-
-- CI/CD
-- Github Actions
-- Docker
-- Docker-Compose
-
-
+### 기술 스택
+- 모바일<br/><img src="https://img.shields.io/badge/android-34A853?style=for-the-badge&logo=android&logoColor=white">
+- 백엔드<br/><img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"> <img src="https://img.shields.io/badge/fastapi-009688?style=for-the-badge&logo=fastapi&logoColor=white">
+- 데이터베이스<br/><img src="https://img.shields.io/badge/postgresql-4169E1?style=for-the-badge&logo=postgresql&logoColor=white">
+- 인프라<br/><img src="https://img.shields.io/badge/aws lightsail-FF9900?style=for-the-badge&logo=lightsail&logoColor=white">
+- CI/CD<br/><img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 
 ### STRUCTURE
 ![오늘 한 글 drawio](https://github.com/user-attachments/assets/7c109bcf-2f15-4653-919b-d6c1f3617628)
