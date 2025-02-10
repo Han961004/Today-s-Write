@@ -6,7 +6,7 @@ from schemas import PostCreate, PostUpdate, PostResponse
 from database import get_db  # 여기서 get_db를 불러옴
 from dependencies import get_current_user
 
-router = APIRouter(prefix="/api/posts", tags=["Posts"])
+router = APIRouter()
 
 # 게시글 생성 (POST)
 @router.post("/", response_model=PostResponse)
