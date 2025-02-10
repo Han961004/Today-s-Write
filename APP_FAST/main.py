@@ -9,7 +9,7 @@ app.include_router(posts.router, prefix='/posts')
 
 # Prometheus 모니터링
 instrumentator = Instrumentator()
-instrumentator.instrument(app).expose(app, endpoint="/api/metrics")
+instrumentator.instrument(app).expose(app, endpoint="/metrics")
 
 # 애플리케이션 시작 시 테이블 생성
 @app.on_event("startup")
