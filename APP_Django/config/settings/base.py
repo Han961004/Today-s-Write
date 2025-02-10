@@ -20,7 +20,7 @@ sentry_sdk.init(
     },
 )
 
-
+APPEND_SLASH = False  # URL 끝에 슬래시를 붙이지 않도록 설정
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+&2r64c8n7j&xc=q1x=@dt3kiq!8=_y&5ux$li+(0ndw_r$=5$'
 
