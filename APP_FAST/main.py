@@ -18,16 +18,11 @@ async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+# 기본 경로 /api는 자동으로 처리되지 않으므로, 반환 값 없이 설정만 해두면 됩니다.
 @app.get("/api/")
 def read_api():
-    return {"message": "FastAPI API Root"}
+    return {}  # 이 경로는 특별한 내용이 필요 없으므로 그냥 두기
 
-# /api/posts 경로를 처리하는 예시
-@app.get("/api/posts/")
-def get_posts():
-    return {"message": "Here are the posts."}
+# /api/posts 경로는 `posts.router`에서 처리되므로 별도의 처리가 필요 없습니다.
 
-# /api/metrics 경로를 처리하는 예시 (Prometheus 모니터링)
-@app.get("/api/metrics/")
-def metrics():
-    return {"message": "Prometheus metrics"}
+# /api/metrics 경로는 instrumentator로 자동 처리되므로 별도로 함수에서 처리할 필요 없음
