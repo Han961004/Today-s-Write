@@ -6,7 +6,7 @@ from models import Post
 from schemas import PostCreate, PostUpdate, PostResponse
 from dependencies import get_current_user  # 이 줄을 추가
 
-router = APIRouter(prefix="/posts", tags=["Posts"])
+router = APIRouter(prefix="/v1/posts", tags=["Posts"])
 
 # 비동기 DB 세션 의존성 주입
 async def get_db():
