@@ -18,6 +18,6 @@ async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-@app.get("/")
-def read_root():
-    return {"message": "FastAPI is running!"}
+@app.get("/api/")
+def read_api():
+    return {"message": "FastAPI API Root"}  # /api/ 경로를 명시적으로 처리
