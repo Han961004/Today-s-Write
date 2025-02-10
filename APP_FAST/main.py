@@ -9,6 +9,6 @@ app.include_router(posts.router)
 instrumentator = Instrumentator()
 instrumentator.instrument(app).expose(app, endpoint="/api/metrics")
 
-@app.get("/")
+@app.get("/api")
 def read_root():
     return {"message": "FastAPI is running!"}
