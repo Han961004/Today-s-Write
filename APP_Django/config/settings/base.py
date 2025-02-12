@@ -26,11 +26,10 @@ SECRET_KEY = 'django-insecure-+&2r64c8n7j&xc=q1x=@dt3kiq!8=_y&5ux$li+(0ndw_r$=5$
 
 INSTALLED_APPS = [
     # apps
-    'apps.accounts.apps.AccountsConfig',
-    # 'apps.posts.apps.PostsConfig',
-    # 'apps.comments.apps.CommentsConfig',
+    'apps.accounts.apps.AccountsConfig',    
+    'django_prometheus',
     
-    
+    # contribu
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,10 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
-    
-    
-    'django_prometheus',
-    
 
 ]
 

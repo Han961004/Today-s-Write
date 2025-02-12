@@ -45,11 +45,9 @@ class PasswordChangeView(APIView):
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
 
-        # 기존 비밀번호 확인
         if not user.check_password(old_password):
             return Response({"detail": "기존 비밀번호가 올바르지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 새로운 비밀번호 저장
         user.set_password(new_password)
         user.save()
         return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=status.HTTP_200_OK)

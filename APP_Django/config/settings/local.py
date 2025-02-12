@@ -1,5 +1,5 @@
 import os
-from .base import *             # 이걸로 base 상속받아서 사용한다. 
+from .base import *  # 이걸로 base 상속받아서 사용한다. 
 
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']

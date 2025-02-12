@@ -10,7 +10,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'app_django'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '0000'),
-        'HOST': os.environ.get('DATABASE_HOST', 'django_db'),  # 여기 수정!
+        'HOST': os.environ.get('DATABASE_HOST', 'django_db'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }

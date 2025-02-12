@@ -14,7 +14,7 @@ class LoginView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data['user']  # user를 validated_data에서 가져옵니다.
+            user = serializer.validated_data['user']
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             
             # JWT 토큰 생성 (access_token, refresh_token)

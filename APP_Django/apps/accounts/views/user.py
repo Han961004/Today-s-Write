@@ -74,8 +74,7 @@ class UserView(APIView):
 
 
 
-## 여기서 부터 검증 필요 ##
-
+## 미완
 class UserDetailView(APIView):
     authentication_classes = []  # 인증 비활성화
     permission_classes = []      # 권한 검사 비활성화

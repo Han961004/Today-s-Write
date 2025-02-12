@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from ..models.user import User
 
-## 로그아웃을 다룰 뷰 (미완)
 
+## 로그아웃을 다룰 뷰 (미완)
 class LogoutView(APIView):
     '''
     로그아웃을 처리하는 View
