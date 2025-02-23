@@ -21,8 +21,8 @@ class LoginView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                 "email": user.email,
-                "access_token": str(refresh.access_token),  # access_token 반환
-                "refresh_token": str(refresh),  # refresh_token 반환
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
             }, status=status.HTTP_200_OK)
 
             

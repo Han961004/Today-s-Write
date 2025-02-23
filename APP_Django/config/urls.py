@@ -6,8 +6,7 @@ from drf_yasg import openapi
 from django_prometheus.exports import ExportToDjangoView
 
 from apps.accounts.views.login import LoginView
-from apps.accounts.views.logout import LogoutView
-from apps.accounts.views.user import *
+from APP_Django.apps.accounts.views.accounts import *
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -33,9 +32,11 @@ urlpatterns = [
     path('sentry-debug/', trigger_error),
 
     
+    # home
+    # path('', ),
+    
     # accounts
-    path('v1/accounts/create/', UserView.as_view()),
-    path('v1/accounts/login/', LoginView.as_view()),
-    path('v1/accounts/logout/', LogoutView.as_view()),
+    path('accounts/create/', UserView.as_view()),
+    path('accounts/login/', LoginView.as_view()),
     
 ]

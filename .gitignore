@@ -25,7 +25,7 @@ media/
 # **/migrations/
 
 # APP 디렉토리 내의 파일 무시 (소스 코드(.py)만 포함)
-APP_Django/**
+# APP_Django/**
 !APP_Django/**/*.py
 
 APP_FAST/**
